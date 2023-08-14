@@ -4,3 +4,10 @@ spring:
     port: 6378
     database: 0
     password:
+    timeout: 2000
+    pool:
+      max-active: 8
+      max-idle: 8
+      max-wait: -1
+      min-idle: 0
+      max-total: 10
