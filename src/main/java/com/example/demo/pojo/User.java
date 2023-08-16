@@ -15,5 +15,5 @@ public class User {
     @ApiModelProperty("名称")
     String name;
     @ApiModelProperty("密码")
-    String passwor;
+    String password;
 }
