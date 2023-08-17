@@ -2,9 +2,11 @@ package com.example.demo.controller;
 
 
 import com.example.demo.config.TokenInterceptor;
+import com.example.demo.config.TokenUtils;
 import com.example.demo.pojo.User;
 import com.example.demo.utils.RedisUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.netty.util.internal.ObjectUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -46,13 +48,15 @@ public class UserController {
     }
     @ApiOperation(value = "登录")
     @GetMapping("/login")
-    public Boolean login(@RequestParam(value = "name") String name, @RequestParam(value = "passWord") String passWord,@RequestParam(value = "token")String token) throws JsonProcessingException {
+    public String login(@RequestParam(value = "name") String name, @RequestParam(value = "passWord") String passWord) throws JsonProcessingException {
         //包装token
         User user = new User();
         user.setName(name);
         user.setPassword(passWord);
-        Boolean rs = redisUtils.verifyToken(token);
-        return rs;
+        String token = TokenUtils.sign(user);
+        System.out.println("token为："+token);
+        return token;
+
     }
 
 }
