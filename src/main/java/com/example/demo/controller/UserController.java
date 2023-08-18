@@ -2,22 +2,16 @@ package com.example.demo.controller;
 
 
 import com.example.demo.config.TokenInterceptor;
-import com.example.demo.config.TokenUtils;
+import com.example.demo.utils.TokenUtils;
 import com.example.demo.pojo.User;
 import com.example.demo.utils.RedisUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.netty.util.internal.ObjectUtil;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-
-import java.util.HashMap;
 
 @RestController
 @Api(tags = "/UserController")
