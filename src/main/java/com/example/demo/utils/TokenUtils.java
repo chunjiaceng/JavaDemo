@@ -4,7 +4,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.example.demo.pojo.User;
+import com.example.demo.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -15,6 +16,9 @@ public class TokenUtils {
     private static final Long EXPIRE_TIME = 1000*60*60L;
     // 签名
     private static final String TOKEN_KEY = "ljdyaishijin**3nkjnj??";
+    // 整合redis
+    @Autowired
+    RedisUtils redisUtils;
 
     //生成Token
     public  static String sign(User user) {
@@ -30,6 +34,7 @@ public class TokenUtils {
         }catch (Exception e){
             e.printStackTrace();
         }
+        
         return token;
     }
 

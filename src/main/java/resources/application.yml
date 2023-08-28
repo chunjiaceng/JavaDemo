@@ -11,3 +11,19 @@ spring:
       max-wait: -1
       min-idle: 0
       max-total: 10
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://8.130.73.219:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*Mapper.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    auto-mapping-behavior: full
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-not-delete-value: 0
+      logic-delete-value: 1
+
+
