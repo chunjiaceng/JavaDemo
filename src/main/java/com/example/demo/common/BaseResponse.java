@@ -26,13 +26,18 @@ public class BaseResponse<T> {
         this.setMsg(msg);
         this.setData(data);
     }
+    public BaseResponse(int code, String msg, T data) {
+        this.setCode(code);
+        this.setMsg(msg);
+        this.setData(data);
+    }
 
     public static <T> BaseResponse<T> success(String token,T data) {
         return new BaseResponse<T>(token ,CODE_SUCCESS, "success", data);
     }
 
     public static <T> BaseResponse<T> success(T data) {
-        return new BaseResponse<T>(null ,CODE_SUCCESS, "success", data);
+        return new BaseResponse<T>(CODE_SUCCESS, "success", data);
     }
 
 }

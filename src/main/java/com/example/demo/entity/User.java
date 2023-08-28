@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,6 +28,8 @@ public class User extends Model {
     private Integer age;
 
     private String password;
+    @TableLogic(value = "0",delval = "1")
+    private String deleted;
 
 
 }
