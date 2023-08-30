@@ -3,7 +3,7 @@ package com.example.demo.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.example.demo.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.example.demo.entity.UserQuery;
+import com.example.demo.entity.response.UserQuery;
 
 /**
  * <p>

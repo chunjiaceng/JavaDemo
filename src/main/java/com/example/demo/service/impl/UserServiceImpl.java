@@ -9,12 +9,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.BaseException;
 import com.example.demo.common.BaseExceptionEnum;
 import com.example.demo.entity.User;
-import com.example.demo.entity.UserQuery;
+import com.example.demo.entity.response.UserQuery;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.demo.utils.RedisUtils;
+import com.example.demo.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>

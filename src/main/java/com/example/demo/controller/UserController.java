@@ -4,19 +4,18 @@ package com.example.demo.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.example.demo.common.BaseResponse;
 import com.example.demo.entity.User;
-import com.example.demo.entity.UserQuery;
+import com.example.demo.entity.request.UserBO;
+import com.example.demo.entity.response.UserQuery;
 import com.example.demo.service.IUserService;
 import com.example.demo.utils.TokenUtils;
 import com.example.demo.utils.RedisUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.annotations.*;
-import org.apache.ibatis.annotations.Delete;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -62,18 +61,18 @@ public class UserController {
 
     @ApiOperation(value = "注册功能")
     @PostMapping("/register")
-    public BaseResponse<User> register(@RequestBody User user){
+    public BaseResponse<User> register(@RequestBody UserBO user){
         User entity = new User();
-        entity.setName(user.getName());
-        entity.setPassword(user.getPassword());
+        BeanUtils.copyProperties(user,entity);
         String token = TokenUtils.sign(entity);
         System.out.println("token为："+token);
-
         return BaseResponse.success(token,iUserServicel.register(entity));
     }
     @ApiOperation(value = "更新用户信息")
     @PutMapping("/user")
-    public BaseResponse<Boolean> update(@RequestBody User user){
-        return BaseResponse.success(iUserServicel.updateById(user));
+    public BaseResponse<Boolean> update(@RequestBody UserBO user){
+        User entity = new User();
+        BeanUtils.copyProperties(user,entity);
+        return BaseResponse.success(iUserServicel.updateById(entity));
     }
 }

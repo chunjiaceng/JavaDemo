@@ -1,4 +1,4 @@
-package com.example.demo.config;
+package com.example.demo.config.db;
 
 import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
