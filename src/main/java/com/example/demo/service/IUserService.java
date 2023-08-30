@@ -18,4 +18,5 @@ public interface IUserService extends IService<User> {
 
     public Boolean delete(Integer id);
     public IPage<User> queryPage(UserQuery query);
+    public User register(User user);
 }

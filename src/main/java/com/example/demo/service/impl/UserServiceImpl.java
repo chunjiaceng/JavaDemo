@@ -69,5 +69,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return  result;
     }
 
+    @Override
+    public User register(User user) {
+        if (StringUtils.isNotEmpty(user.getName()) && StringUtils.isNotEmpty(user.getPassword())){
+            LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper
+                    .eq(StringUtils.isNotEmpty(user.getName()),User::getName,user.getName());
+
+            User one = userMapper.selectOne(queryWrapper);
+            if (!ObjectUtils.isEmpty(one)){
+                throw new BaseException(BaseExceptionEnum.USER_EXSIT);
+            }
+            int rs = userMapper.insert(user);
+            if (rs>0){
+                return userMapper.selectOne(queryWrapper);
+            }
+            throw new BaseException(BaseExceptionEnum.SERVER_ERROR);
+        }
+        throw  new BaseException(BaseExceptionEnum.BODY_NULL);
+
+    }
 
 }

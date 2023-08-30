@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Data
 public class RedisUtils {
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String,String> redisTemplate;
 
     public Object get(final String key){
         return redisTemplate.opsForValue().get(key);
@@ -61,4 +61,6 @@ public class RedisUtils {
         }
         return result;
     }
+
+
 }

@@ -3,6 +3,8 @@ package com.example.demo.config;
 import com.auth0.jwt.exceptions.AlgorithmMismatchException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.demo.common.BaseException;
+import com.example.demo.common.BaseExceptionEnum;
 import com.example.demo.utils.RedisUtils;
 import com.example.demo.utils.TokenUtils;
 import org.json.JSONObject;
@@ -36,8 +38,16 @@ public class TokenInterceptor implements HandlerInterceptor {
         response.setContentType("application/json,charset=utf-8");
         try{
             if (token != null){
-                if (tokenUtils.verify(token)) System.out.println("通过拦截器");
-                return tokenUtils.verify(token);
+//                if (tokenUtils.verify(token)) System.out.println("通过拦截器");
+//                return tokenUtils.verify(token);
+                if (redisUtils.get("token").equals(token)) {
+                    System.out.println("通过拦截器");
+                    return true;
+                }else{
+                    System.out.println("已存在一个token，未通过拦截器");
+                    throw new BaseException(BaseExceptionEnum.TOKEN_ERROR);
+                }
+
             }
             map.put("msg","token不能为空！");
         }catch (SignatureVerificationException e) {

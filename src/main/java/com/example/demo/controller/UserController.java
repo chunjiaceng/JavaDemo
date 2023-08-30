@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Api(tags = "/UserController")
@@ -35,6 +36,7 @@ public class UserController {
         user.setPassword(passWord);
         String token = TokenUtils.sign(user);
         System.out.println("token为："+token);
+        redisUtils.set("token",token,30, TimeUnit.MINUTES);
         return BaseResponse.success(token,iUserServicel.login(user));
 
     }
@@ -56,5 +58,22 @@ public class UserController {
     @PostMapping("/page")
     public BaseResponse<IPage<User>> queryPage(@RequestBody UserQuery query){
         return BaseResponse.success(iUserServicel.queryPage(query));
+    }
+
+    @ApiOperation(value = "注册功能")
+    @PostMapping("/register")
+    public BaseResponse<User> register(@RequestBody User user){
+        User entity = new User();
+        entity.setName(user.getName());
+        entity.setPassword(user.getPassword());
+        String token = TokenUtils.sign(entity);
+        System.out.println("token为："+token);
+
+        return BaseResponse.success(token,iUserServicel.register(entity));
+    }
+    @ApiOperation(value = "更新用户信息")
+    @PutMapping("/user")
+    public BaseResponse<Boolean> update(@RequestBody User user){
+        return BaseResponse.success(iUserServicel.updateById(user));
     }
 }
