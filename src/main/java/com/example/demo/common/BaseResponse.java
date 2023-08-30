@@ -39,6 +39,9 @@ public class BaseResponse<T> {
     public static <T> BaseResponse<T> success(T data) {
         return new BaseResponse<T>(CODE_SUCCESS, "success", data);
     }
+    public static <T> BaseResponse<T> error(T data) {
+        return new BaseResponse<T>(CODE_ERROR, "error", data);
+    }
 
 }
 

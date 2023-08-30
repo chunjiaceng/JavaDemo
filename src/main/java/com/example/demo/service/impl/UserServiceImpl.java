@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.demo.common.BaseException;
+import com.example.demo.common.BaseExceptionEnum;
 import com.example.demo.entity.User;
 import com.example.demo.entity.UserQuery;
 import com.example.demo.mapper.UserMapper;
@@ -39,6 +41,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public Boolean delete(Integer id) {
+        if (id == null){
+            throw  new BaseException(BaseExceptionEnum.BODY_NULL);
+        }
+        User user = userMapper.selectById(id);
+        if (user == null){
+            throw new BaseException(BaseExceptionEnum.USER_NOT_EXIT);
+        }
         return userMapper.deleteById(id) != 0;
     }
 
