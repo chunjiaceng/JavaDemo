@@ -6,19 +6,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.demo.common.BaseException;
-import com.example.demo.common.BaseExceptionEnum;
+import com.example.demo.exception.BaseException;
+import com.example.demo.exception.BaseExceptionEnum;
 import com.example.demo.entity.User;
 import com.example.demo.entity.response.UserQuery;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.demo.utils.RedisUtils;
-import com.example.demo.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -34,12 +30,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     UserMapper userMapper;
 
     public User login(User user) {
+        QueryWrapper<User> queryWrapper1 = new QueryWrapper<>();
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper
+        queryWrapper1
+                .lambda()
+                .eq(StringUtils.isNotEmpty(user.getName()),User::getName,user.getName());
+        User one = userMapper.selectOne(queryWrapper1);
+        if (ObjectUtils.isEmpty(one)){
+            throw new BaseException(BaseExceptionEnum.USER_NOT_EXIT);
+        }
+                queryWrapper
                 .lambda()
                 .eq(StringUtils.isNotEmpty(user.getName()),User::getName,user.getName())
                 .eq(StringUtils.isNotEmpty(user.getPassword()),User::getPassword,user.getPassword());
-        User one = userMapper.selectOne(queryWrapper);
+        one = userMapper.selectOne(queryWrapper);
+        if(ObjectUtils.isEmpty(one)){
+            throw new BaseException(BaseExceptionEnum.PASSWORD_ERROR);
+        }
         return one;
     }
 

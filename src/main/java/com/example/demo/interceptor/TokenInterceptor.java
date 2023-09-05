@@ -1,10 +1,10 @@
-package com.example.demo.config;
+package com.example.demo.interceptor;
 
 import com.auth0.jwt.exceptions.AlgorithmMismatchException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.example.demo.common.BaseException;
-import com.example.demo.common.BaseExceptionEnum;
+import com.example.demo.exception.BaseException;
+import com.example.demo.exception.BaseExceptionEnum;
 import com.example.demo.utils.RedisUtils;
 import com.example.demo.utils.TokenUtils;
 import org.json.JSONObject;
@@ -40,6 +40,7 @@ public class TokenInterceptor implements HandlerInterceptor {
             if (token != null){
 //                if (tokenUtils.verify(token)) System.out.println("通过拦截器");
 //                return tokenUtils.verify(token);
+
                 if (redisUtils.get("token").equals(token)) {
                     System.out.println("通过拦截器");
                     return true;
