@@ -14,7 +14,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+/*
+ * @description: TODO token拦截器
+ * @author: Haruka 曾春佳
+ * @date: 2023/9/6 9:26
+ **/
 @Component
 public class TokenInterceptor implements HandlerInterceptor {
     @Autowired

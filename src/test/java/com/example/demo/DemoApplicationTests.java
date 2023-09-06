@@ -1,6 +1,6 @@
 package com.example.demo;
 
-import com.example.demo.pojo.User;
+import com.example.demo.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +16,7 @@ class DemoApplicationTests {
     private RedisTemplate redisTemplate;
     @Test
     public void redisTest() throws  Exception{
-        User user = new User("haruka","123456");
-        ValueOperations<String,User> ops = redisTemplate.opsForValue();
-        ops.set("user1",user);
-        boolean exit = redisTemplate.hasKey("user1");
-        if (exit){
-            System.out.println("数据库已经存入对应数据");
-            User getUser = (User) redisTemplate.opsForValue().get("user1");
-            System.out.println("数据为：" + getUser);
-        }
+
     }
 
 }
