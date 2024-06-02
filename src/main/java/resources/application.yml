@@ -1,8 +1,8 @@
 spring:
   redis:
-    host: 8.130.73.219
-    port: 6378
-    database: 1
+    host: 127.0.0.1
+    port: 6379
+    database: 2
     password:
     timeout: 2000
     pool:
@@ -14,7 +14,7 @@ spring:
   datasource:
     username: root
     password: 123456
-    url: jdbc:mysql://8.130.73.219:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://127.0.0.1:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=false
 mybatis-plus:
   mapper-locations: classpath*:mapper/**/*Mapper.xml
   configuration:

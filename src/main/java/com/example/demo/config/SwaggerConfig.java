@@ -53,7 +53,7 @@ public class SwaggerConfig{
 
 
     public ApiInfo apiInfo(){
-        Contact contact = new Contact("haruka","www.chunjiazz.com","chunjiaceng@gmail.com");
+        Contact contact = new Contact("Ruby","www.chunjiazz.com","chunjiaceng@gmail.com");
 
         return  new ApiInfo("Swagger API 文档",                    //文档标题
                 "这个是一个 Swagger 接口文档。",              //文档描述

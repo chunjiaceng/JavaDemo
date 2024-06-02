@@ -39,18 +39,18 @@ public class TokenUtils {
     }
 
     //验证Token
-    public  Boolean verify(String token){
-        try{
-            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(TOKEN_KEY)).withIssuer("haruka").build();
-            DecodedJWT decodedJWT = jwtVerifier.verify(token);
-            System.out.println("验证通过");
-            System.out.println("username:"+decodedJWT.getClaim("name").asString());
-            System.out.println("过期时间：      " + decodedJWT.getExpiresAt());
-        }catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
+//    public  Boolean verify(String token){
+//        try{
+//            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(TOKEN_KEY)).withIssuer("haruka").build();
+//            DecodedJWT decodedJWT = jwtVerifier.verify(token);
+//            System.out.println("验证通过");
+//            System.out.println("username:"+decodedJWT.getClaim("name").asString());
+//            System.out.println("过期时间：      " + decodedJWT.getExpiresAt());
+//        }catch (Exception e){
+//            e.printStackTrace();
+//            return false;
+//        }
+//        return true;
+//    }
 
 }
