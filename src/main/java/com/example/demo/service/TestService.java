@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.User;
+import com.example.demo.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +20,7 @@ public class TestService {
     @Transactional
     public void test(){
         User user = new User();
-        user.setName("111");
+        user.setUsername("111");
         userService.save(user);
         throw new RuntimeException();
     }

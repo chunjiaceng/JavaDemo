@@ -1,9 +1,9 @@
 package com.example.demo.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.example.demo.entity.User;
+import com.example.demo.pojo.User;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.example.demo.entity.UserQuery;
+import com.example.demo.pojo.UserQuery;
 
 /**
  * <p>
@@ -14,7 +14,8 @@ import com.example.demo.entity.UserQuery;
  * @since 2023-08-28
  */
 public interface IUserService extends IService<User> {
-    public User login(User user);
+    public User findUserByName(String username);
+
 
     public Boolean delete(Integer id);
     public IPage<User> queryPage(UserQuery query);
