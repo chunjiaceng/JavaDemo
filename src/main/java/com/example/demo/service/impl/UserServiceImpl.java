@@ -9,12 +9,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.BaseException;
 import com.example.demo.common.BaseExceptionEnum;
 import com.example.demo.pojo.User;
-import com.example.demo.pojo.UserQuery;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
  * @since 2023-08-28
  */
 @Service
+@Transactional
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
     @Autowired
     UserMapper userMapper;
@@ -40,7 +41,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public Boolean delete(Integer id) {
+    public Boolean delete(Long id) {
         if (id == null){
             throw  new BaseException(BaseExceptionEnum.BODY_NULL);
         }
@@ -51,19 +52,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return userMapper.deleteById(id) != 0;
     }
 
-    @Override
-    public IPage<User> queryPage(UserQuery query) {
-        IPage<User> page = new Page<>();
-        page.setCurrent(query.getPageNumber());
-        page.setSize(query.getPageSize());
-        page.setTotal(query.getTotal());
-        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper
-                .eq(StringUtils.isNotEmpty(query.getUsername()),User::getUsername,query.getUsername());
-
-        IPage<User> result = userMapper.selectPage(page,queryWrapper);
-        return  result;
-    }
 
     @Override
     public User register(User user) {
