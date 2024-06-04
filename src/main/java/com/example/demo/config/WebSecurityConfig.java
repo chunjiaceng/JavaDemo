@@ -1,5 +1,7 @@
 package com.example.demo.config;
 
+import com.example.demo.common.AccessDeniedHandleImpl;
+import com.example.demo.common.AuthenticationEntryPointImpl;
 import com.example.demo.filter.JwtAuthenticationFilter;
 import com.example.demo.service.LoginUserDetailService;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +15,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.annotation.Resource;
@@ -32,6 +37,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private LoginUserDetailService loginUserDetailService;
     @Resource
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Resource
+    private AccessDeniedHandleImpl accessDeniedHandler;
+    @Resource
+    private AuthenticationEntryPointImpl authenticationEntryPoint;
     @Bean
     public PasswordEncoder passwordEncoder(){
         // 使用BCrypt加密密码
@@ -80,6 +89,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.logout().disable();
         // 将过滤器JWTTokenAuthentication加入到过滤器链中 需要注意必须在Security的UsernamePasswordAuthenticationFilter过滤器链前获取到SecurityContext对象
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler);
 
 
     }

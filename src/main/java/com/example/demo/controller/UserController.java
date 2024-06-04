@@ -25,36 +25,22 @@ public class UserController {
 
     @ApiOperation(value = "查询全部用户信息")
     @GetMapping("/query")
-    @PreAuthorize("hasAnyAuthority('user')")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public BaseResponse<List<User>> query(){
         List<User> list = iUserServicel.list();
         return  BaseResponse.success(list);
     }
-    @ApiOperation(value = "查询全部用户信息")
-    @GetMapping("/query1")
-    @PreAuthorize("hasAnyAuthority('admin')")
-    public BaseResponse<List<User>> query1(){
-        List<User> list = iUserServicel.list();
-        return  BaseResponse.success(list);
-    }
+
     @ApiOperation(value = "根据id删除指定用户信息")
     @DeleteMapping("/user-id")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public BaseResponse<Boolean> delete(@RequestParam("id") Long id){
         return BaseResponse.success(iUserServicel.delete(id));
     }
 
-
-    @ApiOperation(value = "注册功能")
-    @PostMapping("/register")
-    public BaseResponse<User> register(@RequestBody User user){
-        User entity = new User();
-        entity.setUsername(user.getUsername());
-        String encode = new BCryptPasswordEncoder().encode(user.getPassword());
-        entity.setPassword(encode);
-        return BaseResponse.success(iUserServicel.register(entity));
-    }
     @ApiOperation(value = "更新用户信息")
     @PutMapping("/user")
+    @PreAuthorize("hasAnyAuthority('admin')")
     public BaseResponse<Boolean> update(@RequestBody User user){
         return BaseResponse.success(iUserServicel.updateById(user));
     }
