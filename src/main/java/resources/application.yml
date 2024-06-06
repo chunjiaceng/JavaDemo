@@ -38,5 +38,8 @@ jwt:
     SECRET: jwtToken
     # 60s*60min*24h*7day
     expiration: 604800
+log:
+  file:
+    path: src/main/java/resources/log/log.txt
 
 

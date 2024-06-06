@@ -86,6 +86,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 //剩余的都进行鉴权认证
                 .anyRequest().authenticated()
         ;
+        http.cors();
         http.logout().disable();
         // 将过滤器JWTTokenAuthentication加入到过滤器链中 需要注意必须在Security的UsernamePasswordAuthenticationFilter过滤器链前获取到SecurityContext对象
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

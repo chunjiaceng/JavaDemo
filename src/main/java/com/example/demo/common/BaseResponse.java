@@ -45,6 +45,13 @@ public class BaseResponse<T> {
     public static <T> BaseResponse<T> error(int code, String msg) {
         return new BaseResponse<T>(code, msg);
     }
+    public  static BaseResponse success() {
+        return new BaseResponse(CODE_SUCCESS, "success");
+    }
+    public static  BaseResponse error() {
+        return new BaseResponse(CODE_ERROR, "error");
+    }
+
 
 }
 
