@@ -1,0 +1,81 @@
+====================2024-06-10 14:19:43==================== 
+StartTime: 1718000381854
+ProcessTime: 0
+EndTime: 1718000383409
+Code: 200
+Handle: LoginController.login
+Method: POST
+URI: /login
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: InternalAuthenticationServiceException-Could not open JDBC Connection for transaction; nested exception is java.sql.SQLException: Unable to load authentication plugin 'caching_sha2_password'.
+User: -
+====================2024-06-10 14:22:29==================== 
+StartTime: 1718000547462
+ProcessTime: 0
+EndTime: 1718000549167
+Code: 200
+Handle: LoginController.login
+Method: POST
+URI: /login
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: InternalAuthenticationServiceException-Could not open JDBC Connection for transaction; nested exception is java.sql.SQLException: Unable to load authentication plugin 'caching_sha2_password'.
+User: -
+====================2024-06-10 14:23:58==================== 
+StartTime: 1718000635455
+ProcessTime: 1718000638727
+EndTime: 1718000638727
+Code: 200
+Handle: LoginController.login
+Method: POST
+URI: /login
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
+====================2024-06-10 14:29:45==================== 
+StartTime: 1718000981361
+ProcessTime: 0
+EndTime: 1718000985283
+Code: 200
+Handle: LoginController.login
+Method: POST
+URI: /login
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: InternalAuthenticationServiceException-Could not open JDBC Connection for transaction; nested exception is com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+User: -
+====================2024-06-10 14:40:17==================== 
+StartTime: 1718001616202
+ProcessTime: 0
+EndTime: 1718001617430
+Code: 200
+Handle: LoginController.login
+Method: POST
+URI: /login
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: InternalAuthenticationServiceException-Could not open JDBC Connection for transaction; nested exception is com.mysql.cj.jdbc.exceptions.CommunicationsException: Communications link failure
+
+The last packet sent successfully to the server was 0 milliseconds ago. The driver has not received any packets from the server.
+User: -
+====================2024-06-10 14:42:12==================== 
+StartTime: 1718001729281
+ProcessTime: 1718001732543
+EndTime: 1718001732543
+Code: 200
+Handle: LoginController.login
+Method: POST
+URI: /login
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
+====================2024-06-10 14:43:42==================== 
+StartTime: 1718001818708
+ProcessTime: 1718001822211
+EndTime: 1718001822211
+Code: 200
+Handle: LoginController.login
+Method: POST
+URI: /login
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
