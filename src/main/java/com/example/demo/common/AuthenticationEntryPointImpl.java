@@ -1,6 +1,8 @@
 package com.example.demo.common;
 
 import com.alibaba.fastjson.JSON;
+import com.example.demo.exception.BaseException;
+import com.example.demo.exception.BaseExceptionEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -32,8 +34,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        BaseResponse<Object> error = BaseResponse.error(BaseResponse.AUTHENTICATION_ERROR, "认证失败");
-        String result = JSON.toJSONString(error);
+        String result =JSON.toJSONString(BaseResponse.error(new BaseException(BaseExceptionEnum.AUTHENTICATION_ERROR)));
         httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
         httpServletResponse.setCharacterEncoding("UTF-8");
         // 获取响应对象的输出流

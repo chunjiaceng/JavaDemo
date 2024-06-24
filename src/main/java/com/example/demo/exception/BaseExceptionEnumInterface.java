@@ -1,6 +1,6 @@
-package com.example.demo.common;
+package com.example.demo.exception;
 
 public interface BaseExceptionEnumInterface {
-    String getCode();
+    int getCode();
     String getMessage();
 }

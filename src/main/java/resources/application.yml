@@ -13,8 +13,8 @@ spring:
     password: 123456
   datasource:
     username: root
-    password: 123456
-    url: jdbc:mysql://${ALIYUN_SERVER_HOST}:3306/demo?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=false
+    password: 123
+    url: jdbc:mysql://${ALIYUN_SERVER_HOST}:3306/demo?serverTimezone=Asia/Shanghai&useUnicode=true&allowPublicKeyRetrieval=true&characterEncoding=utf-8&useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis-plus:

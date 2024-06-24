@@ -2,12 +2,10 @@ package com.example.demo.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.ObjectUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.demo.common.BaseException;
-import com.example.demo.common.BaseExceptionEnum;
+import com.example.demo.exception.BaseException;
+import com.example.demo.exception.BaseExceptionEnum;
 import com.example.demo.pojo.User;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.service.IUserService;

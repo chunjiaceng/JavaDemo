@@ -1,5 +1,7 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.BaseException;
+import com.example.demo.exception.BaseExceptionEnum;
 import com.example.demo.mapper.MenuMapper;
 import com.example.demo.pojo.LoginUser;
 import com.example.demo.pojo.User;
@@ -36,7 +38,7 @@ public class LoginUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.findUserByName(username);
         if (user == null){
-            throw new UsernameNotFoundException("not User");
+            throw new BaseException(BaseExceptionEnum.USER_NOT_EXIT);
         }
 
         // TODO 用户权限的注入

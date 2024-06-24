@@ -1,6 +1,8 @@
 package com.example.demo.common;
 
 import com.alibaba.fastjson.JSON;
+import com.example.demo.exception.BaseException;
+import com.example.demo.exception.BaseExceptionEnum;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -25,10 +27,7 @@ import java.nio.charset.StandardCharsets;
 public class AccessDeniedHandleImpl implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AccessDeniedException e) throws IOException, ServletException {
-        BaseResponse<Object> error = BaseResponse.error(BaseResponse.ACCREDIT_ERROR, "权限不足");
-
-        String result = JSON.toJSONString(error);
-
+        String result = JSON.toJSONString(BaseResponse.error(new BaseException(BaseExceptionEnum.ACCREDIT_ERROR)));
         httpServletResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
         httpServletResponse.setCharacterEncoding("UTF-8");
         // 获取响应对象的输出流

@@ -1,5 +1,6 @@
 package com.example.demo.common;
 
+import com.example.demo.exception.BaseException;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,10 +11,7 @@ public class BaseResponse<T> {
 
      static final int CODE_ERROR = 500;
 
-    // 认证失败错误码
-     static final int AUTHENTICATION_ERROR = 403;
-    // 授权失败错误码
-     static final int ACCREDIT_ERROR = 401;
+
 
     private int code;
 
@@ -32,24 +30,19 @@ public class BaseResponse<T> {
         this.setMsg(msg);
     }
 
-
-    public static <T> BaseResponse<T> success(T data) {
-        return new BaseResponse<T>(CODE_SUCCESS, "success", data);
-    }
-    public static <T> BaseResponse<T> error(T data) {
-        return new BaseResponse<T>(CODE_ERROR, "error", data);
-    }
-    public static <T> BaseResponse<T> error(String msg) {
-        return new BaseResponse<T>(CODE_ERROR, msg);
-    }
-    public static <T> BaseResponse<T> error(int code, String msg) {
-        return new BaseResponse<T>(code, msg);
-    }
     public  static BaseResponse success() {
         return new BaseResponse(CODE_SUCCESS, "success");
     }
+    public static <T> BaseResponse<T> success(T data) {
+        return new BaseResponse<T>(CODE_SUCCESS, "success", data);
+    }
+
+    public static  BaseResponse error(BaseException e) {
+        return new BaseResponse(e.getCode(), e.getMessage());
+    }
+
     public static  BaseResponse error() {
-        return new BaseResponse(CODE_ERROR, "error");
+        return new BaseResponse(CODE_ERROR, "服务器出现异常");
     }
 
 
