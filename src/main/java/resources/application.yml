@@ -29,15 +29,21 @@ mybatis-plus:
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
 
-
+## jwt相关配置
 jwt:
   data:
     # jwt 加密密钥
     SECRET: jwtToken
     # 60s*60min*24h*7day
     expiration: 604800
+## log日志处理相关配置
 log:
   file:
     path: src/main/java/resources/log/log.txt
 
-
+## minio配置
+minio:
+  endpoint: http://${ALIYUN_SERVER_HOST}:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucketName: demo-bucket
