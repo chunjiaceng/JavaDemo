@@ -1,6 +1,8 @@
 package com.example.demo.utils;
 
+import com.google.common.collect.HashMultimap;
 import io.minio.*;
+import io.minio.errors.*;
 import io.minio.http.Method;
 import io.minio.messages.Bucket;
 import io.minio.messages.DeleteObject;
@@ -8,16 +10,22 @@ import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Decoder;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Ruby Ceng 曾春佳
@@ -253,6 +261,8 @@ public class MinioUtils {
                         .build());
     }
 
+
+
     /**
      * 图片上传
      * @param bucketName
@@ -319,6 +329,7 @@ public class MinioUtils {
                         .stream(inputStream, inputStream.available(), -1)
                         .build());
     }
+
 
     /**
      * 创建文件夹或目录
@@ -446,4 +457,20 @@ public class MinioUtils {
         String url = str.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
         return URLDecoder.decode(url, "UTF-8");
     }
+/**
+ * @description: TODO 根据策略和对象名称创建第三方post请求将文件直接发送到oss服务器
+ * @author: Ruby Ceng 曾春佳
+ * @date: 2024/7/2 17:13
+ * @param: [policy, bucketName, objectName,prefix]
+ * @return: java.util.Map<java.lang.String,java.lang.String>
+ **/
+    public Map<String,String> getPresignedPostFormData(String bucketName,String objectName,String prefix,ZonedDateTime expiration) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        PostPolicy policy = new PostPolicy(bucketName, expiration);
+        // 上传对象名称
+        policy.addEqualsCondition("key",objectName);
+        // 设置Content-Type前缀，指定上传文件类型
+        policy.addStartsWithCondition("Content-Type",prefix);
+        return minioClient.getPresignedPostFormData(policy);
+    }
+
 }

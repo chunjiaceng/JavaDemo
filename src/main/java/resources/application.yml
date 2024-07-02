@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
   redis:
     host: ${ALIYUN_SERVER_HOST}
     port: 6378
