@@ -1,8 +1,13 @@
 package com.example.demo.config;
 
+import com.example.demo.common.OssProperties;
+import com.example.demo.utils.MinioUtils;
 import io.minio.MinioClient;
 import lombok.Data;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.*;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,40 +20,27 @@ import org.springframework.context.annotation.Configuration;
  */
 
 
-@Data
-@Configuration
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnClass({MinioClient.class})
+@EnableConfigurationProperties(OssProperties.class)
+@ConditionalOnExpression("${oss.enabled}")
+@ConditionalOnProperty(value = "oss.type", havingValue = "minio")
 public class MinioConfig {
 
-    /**
-     * 访问地址
-     */
-    @Value("${minio.endpoint}")
-    private String endpoint;
-
-    /**
-     * accessKey类似于用户ID，用于唯一标识你的账户
-     */
-    @Value("${minio.accessKey}")
-    private String accessKey;
-
-    /**
-     * secretKey是你账户的密码
-     */
-    @Value("${minio.secretKey}")
-    private String secretKey;
-
-    /**
-     * 默认存储桶
-     */
-    @Value("${minio.bucketName}")
-    private String bucketName;
+    @Bean
+    @SneakyThrows
+    @ConditionalOnMissingBean(MinioClient.class)
+    public MinioClient minioClient(OssProperties ossProperties) {
+        return MinioClient.builder()
+                .endpoint(ossProperties.getEndpoint())
+                .credentials(ossProperties.getAccessKey(), ossProperties.getSecretKey())
+                .build();
+    }
 
     @Bean
-    public MinioClient minioClient() {
-        MinioClient minioClient = MinioClient.builder()
-                .endpoint(endpoint)
-                .credentials(accessKey, secretKey)
-                .build();
-        return minioClient;
+    @ConditionalOnBean({MinioClient.class})
+    @ConditionalOnMissingBean(MinioUtils.class)
+    public MinioUtils minioUtils(MinioClient minioClient, OssProperties ossProperties) {
+        return new MinioUtils(minioClient, ossProperties);
     }
 }

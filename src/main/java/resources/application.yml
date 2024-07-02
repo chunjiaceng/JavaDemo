@@ -45,9 +45,12 @@ log:
   file:
     path: src/main/java/resources/log/log.txt
 
-## minio配置
-minio:
+## oss服务相关配置
+oss:
+  enabled: true
+  type: MINIO
   endpoint: http://${ALIYUN_SERVER_HOST}:9000
-  accessKey: minioadmin
-  secretKey: minioadmin
-  bucketName: demo-bucket
+  access-key: minioadmin
+  secret-key: minioadmin
+  default-bucket-name: demo-bucket
+

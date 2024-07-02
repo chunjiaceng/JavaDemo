@@ -1,5 +1,10 @@
 package com.example.demo.utils;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
+import com.example.demo.common.OssFile;
+import com.example.demo.common.OssProperties;
+import com.example.demo.config.MinioConfig;
 import com.google.common.collect.HashMultimap;
 import io.minio.*;
 import io.minio.errors.*;
@@ -7,15 +12,18 @@ import io.minio.http.Method;
 import io.minio.messages.Bucket;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import sun.misc.BASE64Decoder;
 
+import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,440 +45,180 @@ import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
-@Component
-// 自动生成包含Final字段的构造函数
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class MinioUtils {
-    private final MinioClient minioClient;
-
-    /******************************  Operate Bucket Start  ******************************/
+    /**
+     * MinIO 客户端
+     */
+    MinioClient minioClient;
 
     /**
-     * 启动SpringBoot容器的时候初始化Bucket
-     * 如果没有Bucket则创建
-     *
-     * @param bucketName
+     * MinIO 配置类
      */
-    @SneakyThrows(Exception.class)
-    private void createBucket(String bucketName) {
-        if (!bucketExists(bucketName)) {
-            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-        }
+    OssProperties ossProperties;
+
+    /**
+     * 查询所有存储桶
+     *
+     * @return Bucket 集合
+     */
+    @SneakyThrows
+    public List<Bucket> listBuckets() {
+        return minioClient.listBuckets();
     }
 
     /**
-     * 判断Bucket是否存在，true：存在，false：不存在
+     * 桶是否存在
      *
-     * @param bucketName
-     * @return
+     * @param bucketName 桶名
+     * @return 是否存在
      */
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     public boolean bucketExists(String bucketName) {
         return minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
     }
 
     /**
-     * 获得Bucket的策略
+     * 创建存储桶
      *
-     * @param bucketName
-     * @return
+     * @param bucketName 桶名
      */
-    @SneakyThrows(Exception.class)
-    public String getBucketPolicy(String bucketName) {
-        return minioClient.getBucketPolicy(GetBucketPolicyArgs
-                .builder()
-                .bucket(bucketName)
-                .build());
+    @SneakyThrows
+    public void makeBucket(String bucketName) {
+        if (!bucketExists(bucketName)) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+
+        }
     }
 
     /**
-     * 获得所有Bucket列表
+     * 删除一个空桶 如果存储桶存在对象不为空时，删除会报错。
      *
-     * @return
+     * @param bucketName 桶名
      */
-    @SneakyThrows(Exception.class)
-    public List<Bucket> getAllBuckets() {
-        return minioClient.listBuckets();
-    }
-
-    /**
-     * 根据bucketName获取其相关信息
-     *
-     * @param bucketName
-     * @return
-     */
-    @SneakyThrows(Exception.class)
-    public Optional<Bucket> getBucket(String bucketName) {
-        return getAllBuckets().stream().filter(b -> b.name().equals(bucketName)).findFirst();
-    }
-
-    /**
-     * 根据bucketName删除Bucket，true：删除成功； false：删除失败，文件或已不存在
-     *
-     * @param bucketName
-     * @throws Exception
-     */
-    @SneakyThrows(Exception.class)
+    @SneakyThrows
     public void removeBucket(String bucketName) {
         minioClient.removeBucket(RemoveBucketArgs.builder().bucket(bucketName).build());
     }
 
-    /******************************  Operate Bucket End  ******************************/
-
-
-    /******************************  Operate Files Start  ******************************/
-
     /**
-     * 判断文件是否存在
+     * 上传文件
      *
-     * @param bucketName
-     * @param objectName
-     * @return
+     * @param inputStream      流
+     * @param originalFileName 原始文件名
+     * @param bucketName       桶名
+     * @return OssFile
      */
-    public boolean isObjectExist(String bucketName, String objectName) {
-        boolean exist = true;
+    @SneakyThrows
+    public OssFile putObject(InputStream inputStream, String bucketName, String originalFileName) {
+        String uuidFileName = generateOssUuidFileName(originalFileName);
         try {
-            minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(objectName).build());
-        } catch (Exception e) {
-            log.error("[Minio工具类]>>>> 判断文件是否存在, 异常：", e);
-            exist = false;
-        }
-        return exist;
-    }
-
-    /**
-     * 判断文件夹是否存在
-     *
-     * @param bucketName
-     * @param objectName
-     * @return
-     */
-    public boolean isFolderExist(String bucketName, String objectName) {
-        boolean exist = false;
-        try {
-            Iterable<Result<Item>> results = minioClient.listObjects(
-                    ListObjectsArgs.builder().bucket(bucketName).prefix(objectName).recursive(false).build());
-            for (Result<Item> result : results) {
-                Item item = result.get();
-                if (item.isDir() && objectName.equals(item.objectName())) {
-                    exist = true;
-                }
+            if (StrUtil.isEmpty(bucketName)) {
+                bucketName = ossProperties.getDefaultBucketName();
             }
-        } catch (Exception e) {
-            log.error("[Minio工具类]>>>> 判断文件夹是否存在，异常：", e);
-            exist = false;
-        }
-        return exist;
-    }
-
-    /**
-     * 根据文件前置查询文件
-     *
-     * @param bucketName 存储桶
-     * @param prefix     前缀
-     * @param recursive  是否使用递归查询
-     * @return MinioItem 列表
-     */
-    @SneakyThrows(Exception.class)
-    public List<Item> getAllObjectsByPrefix(String bucketName,
-                                            String prefix,
-                                            boolean recursive) {
-        List<Item> list = new ArrayList<>();
-        Iterable<Result<Item>> objectsIterator = minioClient.listObjects(
-                ListObjectsArgs.builder().bucket(bucketName).prefix(prefix).recursive(recursive).build());
-        if (objectsIterator != null) {
-            for (Result<Item> o : objectsIterator) {
-                Item item = o.get();
-                list.add(item);
+            minioClient.putObject(
+                    PutObjectArgs.builder().bucket(bucketName).object(uuidFileName).stream(
+                                    inputStream, inputStream.available(), -1)
+                            .build());
+            return new OssFile(originalFileName, uuidFileName);
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
             }
         }
-        return list;
     }
 
     /**
-     * 获取文件流
+     * 返回临时带签名、过期时间一天、Get请求方式的访问URL
      *
-     * @param bucketName 存储桶
-     * @param objectName 文件名
-     * @return 二进制流
+     * @param bucketName  桶名
+     * @param ossFilePath Oss文件路径
+     * @return
      */
-    @SneakyThrows(Exception.class)
-    public InputStream getObject(String bucketName, String objectName) {
-        return minioClient.getObject(
-                GetObjectArgs.builder()
+    @SneakyThrows
+    public String getPresignedObjectUrl(String bucketName, String ossFilePath) {
+        if (StrUtil.isEmpty(bucketName)){
+            bucketName = ossProperties.getDefaultBucketName();
+        }
+        return minioClient.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                        .method(Method.GET)
                         .bucket(bucketName)
-                        .object(objectName)
+                        .object(ossFilePath)
+                        .expiry(60 * 60 * 24)
                         .build());
     }
 
     /**
-     * 断点下载
+     * GetObject接口用于获取某个文件（Object）。此操作需要对此Object具有读权限。
      *
-     * @param bucketName 存储桶
-     * @param objectName 文件名称
-     * @param offset     起始字节的位置
-     * @param length     要读取的长度
-     * @return 二进制流
+     * @param bucketName  桶名
+     * @param ossFilePath Oss文件路径
      */
-    @SneakyThrows(Exception.class)
-    public InputStream getObject(String bucketName, String objectName, long offset, long length) {
+    @SneakyThrows
+    public InputStream getObject(String bucketName, String ossFilePath) {
+        if (StrUtil.isEmpty(bucketName)){
+            bucketName = ossProperties.getDefaultBucketName();
+        }
         return minioClient.getObject(
-                GetObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(objectName)
-                        .offset(offset)
-                        .length(length)
-                        .build());
+                GetObjectArgs.builder().bucket(bucketName).object(ossFilePath).build());
     }
 
     /**
-     * 获取路径下文件列表
+     * 查询桶的对象信息
      *
-     * @param bucketName 存储桶
-     * @param prefix     文件名称
-     * @param recursive  是否递归查找，false：模拟文件夹结构查找
-     * @return 二进制流
+     * @param bucketName 桶名
+     * @param recursive  是否递归查询
+     * @return
      */
-    public Iterable<Result<Item>> listObjects(String bucketName, String prefix, boolean recursive) {
+    @SneakyThrows
+    public Iterable<Result<Item>> listObjects(String bucketName, boolean recursive) {
         return minioClient.listObjects(
-                ListObjectsArgs.builder()
-                        .bucket(bucketName)
-                        .prefix(prefix)
-                        .recursive(recursive)
-                        .build());
+                ListObjectsArgs.builder().bucket(bucketName).recursive(recursive).build());
     }
 
     /**
-     * 使用MultipartFile进行文件上传
+     * 生成随机文件名，防止重复
      *
-     * @param bucketName  存储桶
-     * @param file        文件名
-     * @param objectName  对象名
-     * @param contentType 类型
+     * @param originalFilename 原始文件名
      * @return
      */
-    @SneakyThrows(Exception.class)
-    public ObjectWriteResponse uploadFile(String bucketName, MultipartFile file, String objectName, String contentType) {
-        InputStream inputStream = file.getInputStream();
-        return minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(objectName)
-                        .contentType(contentType)
-                        .stream(inputStream, inputStream.available(), -1)
-                        .build());
-    }
-
-
-
-    /**
-     * 图片上传
-     * @param bucketName
-     * @param imageBase64
-     * @param imageName
-     * @return
-     */
-    public ObjectWriteResponse uploadImage(String bucketName, String imageBase64, String imageName) {
-        if (!StringUtils.isEmpty(imageBase64)) {
-            InputStream in = base64ToInputStream(imageBase64);
-            String newName = System.currentTimeMillis() + "_" + imageName + ".jpg";
-            String year = String.valueOf(new Date().getYear());
-            String month = String.valueOf(new Date().getMonth());
-            return uploadFile(bucketName, year + "/" + month + "/" + newName, in);
-
-        }
-        return null;
-    }
-
-    public static InputStream base64ToInputStream(String base64) {
-        ByteArrayInputStream stream = null;
-        try {
-            byte[] bytes = new BASE64Decoder().decodeBuffer(base64.trim());
-            stream = new ByteArrayInputStream(bytes);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return stream;
-    }
-
-
-    /**
-     * 上传本地文件
-     *
-     * @param bucketName 存储桶
-     * @param objectName 对象名称
-     * @param fileName   本地文件路径
-     * @return
-     */
-    @SneakyThrows(Exception.class)
-    public ObjectWriteResponse uploadFile(String bucketName, String objectName, String fileName) {
-        return minioClient.uploadObject(
-                UploadObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(objectName)
-                        .filename(fileName)
-                        .build());
+    public String generateOssUuidFileName(String originalFilename) {
+        return "files" + StrUtil.SLASH + DateUtil.format(new Date(), "yyyy-MM-dd") + StrUtil.SLASH + UUID.randomUUID() + StrUtil.SLASH + originalFilename;
     }
 
     /**
-     * 通过流上传文件
-     *
-     * @param bucketName  存储桶
-     * @param objectName  文件对象
-     * @param inputStream 文件流
-     * @return
-     */
-    @SneakyThrows(Exception.class)
-    public ObjectWriteResponse uploadFile(String bucketName, String objectName, InputStream inputStream) {
-        return minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(objectName)
-                        .stream(inputStream, inputStream.available(), -1)
-                        .build());
-    }
-
-
-    /**
-     * 创建文件夹或目录
-     *
-     * @param bucketName 存储桶
-     * @param objectName 目录路径
-     * @return
-     */
-    @SneakyThrows(Exception.class)
-    public ObjectWriteResponse createDir(String bucketName, String objectName) {
-        return minioClient.putObject(
-                PutObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(objectName)
-                        .stream(new ByteArrayInputStream(new byte[]{}), 0, -1)
-                        .build());
-    }
-
-    /**
-     * 获取文件信息, 如果抛出异常则说明文件不存在
-     *
-     * @param bucketName 存储桶
-     * @param objectName 文件名称
-     * @return
-     */
-    @SneakyThrows(Exception.class)
-    public String getFileStatusInfo(String bucketName, String objectName) {
-        return minioClient.statObject(
-                StatObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(objectName)
-                        .build()).toString();
-    }
-
-    /**
-     * 拷贝文件
-     *
-     * @param bucketName    存储桶
-     * @param objectName    文件名
-     * @param srcBucketName 目标存储桶
-     * @param srcObjectName 目标文件名
-     */
-    @SneakyThrows(Exception.class)
-    public ObjectWriteResponse copyFile(String bucketName, String objectName, String srcBucketName, String srcObjectName) {
-        return minioClient.copyObject(
-                CopyObjectArgs.builder()
-                        .source(CopySource.builder().bucket(bucketName).object(objectName).build())
-                        .bucket(srcBucketName)
-                        .object(srcObjectName)
-                        .build());
-    }
-
-    /**
-     * 删除文件
-     *
-     * @param bucketName 存储桶
-     * @param objectName 文件名称
-     */
-    @SneakyThrows(Exception.class)
-    public void removeFile(String bucketName, String objectName) {
-        minioClient.removeObject(
-                RemoveObjectArgs.builder()
-                        .bucket(bucketName)
-                        .object(objectName)
-                        .build());
-    }
-
-    /**
-     * 批量删除文件
-     *
-     * @param bucketName 存储桶
-     * @param keys       需要删除的文件列表
-     * @return
-     */
-    public void removeFiles(String bucketName, List<String> keys) {
-        List<DeleteObject> objects = new LinkedList<>();
-        keys.forEach(s -> {
-            objects.add(new DeleteObject(s));
-            try {
-                removeFile(bucketName, s);
-            } catch (Exception e) {
-                log.error("[Minio工具类]>>>> 批量删除文件，异常：", e);
-            }
-        });
-    }
-
-    /**
-     * 获取文件外链
-     *
-     * @param bucketName 存储桶
-     * @param objectName 文件名
-     * @param expires    过期时间 <=7 秒 （外链有效时间（单位：秒））
-     * @return url
-     */
-    @SneakyThrows(Exception.class)
-    public String getPresignedObjectUrl(String bucketName, String objectName, Integer expires) {
-        GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder().expiry(expires).bucket(bucketName).object(objectName).build();
-        return minioClient.getPresignedObjectUrl(args);
-    }
-
-    /**
-     * 获得文件外链
+     * 获取带签名的临时上传元数据对象，前端可获取后，直接上传到Minio
      *
      * @param bucketName
-     * @param objectName
-     * @return url
-     */
-    @SneakyThrows(Exception.class)
-    public String getPresignedObjectUrl(String bucketName, String objectName) {
-        GetPresignedObjectUrlArgs args = GetPresignedObjectUrlArgs.builder()
-                .bucket(bucketName)
-                .object(objectName)
-                .method(Method.GET).build();
-        return minioClient.getPresignedObjectUrl(args);
-    }
-
-    /**
-     * 将URLDecoder编码转成UTF8
-     *
-     * @param str
+     * @param fileName
      * @return
-     * @throws UnsupportedEncodingException
      */
-    public String getUtf8ByURLDecoder(String str) throws UnsupportedEncodingException {
-        String url = str.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
-        return URLDecoder.decode(url, "UTF-8");
-    }
-/**
- * @description: TODO 根据策略和对象名称创建第三方post请求将文件直接发送到oss服务器
- * @author: Ruby Ceng 曾春佳
- * @date: 2024/7/2 17:13
- * @param: [policy, bucketName, objectName,prefix]
- * @return: java.util.Map<java.lang.String,java.lang.String>
- **/
-    public Map<String,String> getPresignedPostFormData(String bucketName,String objectName,String prefix,ZonedDateTime expiration) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        PostPolicy policy = new PostPolicy(bucketName, expiration);
-        // 上传对象名称
-        policy.addEqualsCondition("key",objectName);
-        // 设置Content-Type前缀，指定上传文件类型
-        policy.addStartsWithCondition("Content-Type",prefix);
+    @SneakyThrows
+    public Map<String, String> getPresignedPostFormData(String bucketName, String fileName) {
+        // 为存储桶创建一个上传策略，过期时间为7天
+        PostPolicy policy = new PostPolicy(bucketName, ZonedDateTime.now().plusDays(7));
+        // 设置一个参数key，值为上传对象的名称
+        policy.addEqualsCondition("key", fileName);
+        // 添加Content-Type以"image/"开头，表示只能上传照片
+        policy.addStartsWithCondition("Content-Type", "image/");
+        // 设置上传文件的大小 64kiB to 10MiB.
+        policy.addContentLengthRangeCondition(64 * 1024, 10 * 1024 * 1024);
         return minioClient.getPresignedPostFormData(policy);
     }
 
+    /**
+     * 初始化默认存储桶
+     */
+    @PostConstruct
+    public void initDefaultBucket() {
+        String defaultBucketName = ossProperties.getDefaultBucketName();
+        if (bucketExists(defaultBucketName)) {
+            log.info("默认存储桶已存在");
+        } else {
+            log.info("创建默认存储桶");
+            makeBucket(ossProperties.getDefaultBucketName());
+        }
+        ;
+    }
 }

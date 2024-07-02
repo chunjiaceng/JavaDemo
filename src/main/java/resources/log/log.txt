@@ -42,3 +42,91 @@ URI: /oss/download
 RemoteAddr: 0:0:0:0:0:0:0:1
 Exception: 
 User: ruby
+====================2024-07-02 18:46:09==================== 
+StartTime: 1719917168753
+ProcessTime: 1719917169012
+EndTime: 1719917169012
+Code: 200
+Handle: OssController.upload
+Method: POST
+URI: /oss/upload
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
+====================2024-07-02 18:51:16==================== 
+StartTime: 1719917476023
+ProcessTime: 0
+EndTime: 1719917476274
+Code: 200
+Handle: OssController.upload
+Method: POST
+URI: /oss/upload
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: ErrorResponseException-The specified key does not exist.
+User: -
+====================2024-07-02 18:51:16==================== 
+StartTime: 1719917476291
+ProcessTime: 1719917476340
+EndTime: 1719917476340
+Code: 500
+Handle: BasicErrorController.error
+Method: POST
+URI: /error
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
+====================2024-07-02 18:52:01==================== 
+StartTime: 1719917521246
+ProcessTime: 0
+EndTime: 1719917521462
+Code: 200
+Handle: OssController.upload
+Method: POST
+URI: /oss/upload
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: IllegalArgumentException-bucket name must not be null.
+User: -
+====================2024-07-02 18:52:01==================== 
+StartTime: 1719917521481
+ProcessTime: 1719917521531
+EndTime: 1719917521531
+Code: 500
+Handle: BasicErrorController.error
+Method: POST
+URI: /error
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
+====================2024-07-02 18:52:34==================== 
+StartTime: 1719917554498
+ProcessTime: 1719917554754
+EndTime: 1719917554754
+Code: 200
+Handle: OssController.upload
+Method: POST
+URI: /oss/upload
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
+====================2024-07-02 18:57:39==================== 
+StartTime: 1719917848901
+ProcessTime: 1719917859946
+EndTime: 1719917859946
+Code: 200
+Handle: OssController.upload
+Method: POST
+URI: /oss/upload
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
+====================2024-07-02 18:58:36==================== 
+StartTime: 1719917912702
+ProcessTime: 1719917916083
+EndTime: 1719917916083
+Code: 200
+Handle: OssController.upload
+Method: POST
+URI: /oss/upload
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
