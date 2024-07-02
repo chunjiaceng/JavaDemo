@@ -130,3 +130,36 @@ URI: /oss/upload
 RemoteAddr: 0:0:0:0:0:0:0:1
 Exception: 
 User: -
+====================2024-07-02 19:19:53==================== 
+StartTime: 1719919193928
+ProcessTime: 0
+EndTime: 1719919193963
+Code: 200
+Handle: OssController.upload
+Method: POST
+URI: /oss/upload
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: NullPointerException-null
+User: -
+====================2024-07-02 19:19:54==================== 
+StartTime: 1719919193981
+ProcessTime: 1719919194026
+EndTime: 1719919194026
+Code: 500
+Handle: BasicErrorController.error
+Method: POST
+URI: /error
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
+====================2024-07-02 19:22:44==================== 
+StartTime: 1719919364239
+ProcessTime: 1719919364498
+EndTime: 1719919364498
+Code: 200
+Handle: OssController.upload
+Method: POST
+URI: /oss/upload
+RemoteAddr: 0:0:0:0:0:0:0:1
+Exception: 
+User: -
