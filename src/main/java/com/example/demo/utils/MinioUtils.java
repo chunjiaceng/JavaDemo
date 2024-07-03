@@ -4,14 +4,17 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import com.example.demo.common.OssFile;
 import com.example.demo.common.OssProperties;
+import com.example.demo.common.PearlMinioClient;
 import com.example.demo.config.MinioConfig;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.http.Method;
 import io.minio.messages.Bucket;
 import io.minio.messages.DeleteObject;
 import io.minio.messages.Item;
+import io.minio.messages.Part;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -50,7 +53,7 @@ public class MinioUtils {
     /**
      * MinIO 客户端
      */
-    MinioClient minioClient;
+    PearlMinioClient minioClient;
 
     /**
      * MinIO 配置类
@@ -148,6 +151,25 @@ public class MinioUtils {
                         .expiry(60 * 60 * 24)
                         .build());
     }
+    /**
+     * 返回临时带签名、过期时间一天、Get请求方式的访问URL 携带查询参数
+     *
+     * @param bucketName  桶名
+     * @param ossFilePath Oss文件路径
+     * @return
+     */
+    @SneakyThrows
+    public String getPresignedObjectUrl(String bucketName, String ossFilePath,Map<String, String> queryParams) {
+        if (StrUtil.isEmpty(bucketName))bucketName = ossProperties.getDefaultBucketName();
+        return minioClient.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                        .method(Method.PUT)
+                        .bucket(bucketName)
+                        .object(ossFilePath)
+                        .expiry(60 * 60 * 24)
+                        .extraQueryParams(queryParams)
+                        .build());
+    }
 
     /**
      * GetObject接口用于获取某个文件（Object）。此操作需要对此Object具有读权限。
@@ -220,5 +242,49 @@ public class MinioUtils {
             makeBucket(ossProperties.getDefaultBucketName());
         }
         ;
+    }
+    /**
+     *  上传分片上传请求，返回uploadId
+     */
+    public CreateMultipartUploadResponse uploadId(String bucketName, String region, String objectName, Multimap<String, String> headers, Multimap<String, String> extraQueryParams) throws NoSuchAlgorithmException, InsufficientDataException, IOException, InvalidKeyException, ServerException, XmlParserException, ErrorResponseException, InternalException, InvalidResponseException {
+        if(StrUtil.isEmpty(bucketName)){
+            bucketName = ossProperties.getDefaultBucketName();
+        }
+
+        return minioClient.createMultipartUpload(bucketName, region, objectName, headers, extraQueryParams);
+    }
+    /**
+     * 完成分片上传，执行合并文件
+     *
+     * @param bucketName       存储桶
+     * @param region           区域
+     * @param objectName       对象名
+     * @param uploadId         上传ID
+     * @param parts            分片
+     * @param extraHeaders     额外消息头
+     * @param extraQueryParams 额外查询参数
+     */
+    public ObjectWriteResponse completeMultipartUpload(String bucketName, String region, String objectName, String uploadId, Part[] parts, Multimap<String, String> extraHeaders, Multimap<String, String> extraQueryParams) throws NoSuchAlgorithmException, InsufficientDataException, IOException, InvalidKeyException, ServerException, XmlParserException, ErrorResponseException, InternalException, InvalidResponseException {
+        if(StrUtil.isEmpty(bucketName)){
+            bucketName = ossProperties.getDefaultBucketName();
+        }
+        return minioClient.completeMultipartUpload(bucketName, region, objectName, uploadId, parts, extraHeaders, extraQueryParams);
+    }
+    /**
+     * 查询分片数据
+     *
+     * @param bucketName       存储桶
+     * @param region           区域
+     * @param objectName       对象名
+     * @param uploadId         上传ID
+     * @param extraHeaders     额外消息头
+     * @param extraQueryParams 额外查询参数
+     */
+    public ListPartsResponse listMultipart(String bucketName, String region, String objectName, Integer maxParts, Integer partNumberMarker, String uploadId, Multimap<String, String> extraHeaders, Multimap<String, String> extraQueryParams) throws NoSuchAlgorithmException, InsufficientDataException, IOException, InvalidKeyException, ServerException, XmlParserException, ErrorResponseException, InternalException, InvalidResponseException {
+        if(StrUtil.isEmpty(bucketName)){
+            bucketName = ossProperties.getDefaultBucketName();
+        }
+
+        return minioClient.listMultipart(bucketName, region, objectName, maxParts, partNumberMarker, uploadId, extraHeaders, extraQueryParams);
     }
 }
