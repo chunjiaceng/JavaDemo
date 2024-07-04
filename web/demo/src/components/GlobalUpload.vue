@@ -77,14 +77,16 @@ export default {
   },
   methods: {
     onFileAdded(file) {
+      console.log(file);
       console.log("文件被添加：" + file.name);
+
+      var res = this.getChunkUploadUrl(file);
+      console.log("文件被添加查看是否获取到分块URL");
+      console.log(file.chunkUrlData);
       // 计算MD5
       // this.computeMD5(file, this.options.chunkSize);
       // 获取分块上传链接
       // eslint-disable-next-line no-unused-vars
-      var res = this.getChunkUploadUrl(file);
-      console.log("文件被添加查看是否获取到分块URL");
-      console.log(file.chunkUrlData);
     },
     async getChunkUploadUrl(file) {
       // 向具有指定ID的用户发出请求

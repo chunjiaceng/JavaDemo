@@ -1,9 +1,11 @@
 package com.example.demo.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.example.demo.common.OssFile;
 import com.example.demo.utils.MinioUtils;
 import io.minio.CreateMultipartUploadResponse;
 import io.minio.ListPartsResponse;
+import io.minio.errors.*;
 import io.minio.messages.Part;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +38,11 @@ public class OssController {
     @Autowired
     MinioUtils minioUtils;
     @PostMapping("/upload")
-    public Object upload(MultipartFile file, String bucketName) throws IOException {
+    public Object upload(MultipartFile file, String bucketName, HttpServletRequest request) throws IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        String uniqueIdentifier = request.getParameter("uniqueIdentifier");
+        if(minioUtils.md5Verify(null,file.getOriginalFilename(),uniqueIdentifier) && StrUtil.isEmpty(uniqueIdentifier)){
+            return minioUtils.getPresignedObjectUrl(null,file.getOriginalFilename());
+        }
         OssFile ossFile = minioUtils.putObject(file.getInputStream(), bucketName, file.getOriginalFilename());
         return minioUtils.getPresignedObjectUrl(null,ossFile.getOssFilePath());
     }

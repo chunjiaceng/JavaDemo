@@ -287,4 +287,20 @@ public class MinioUtils {
 
         return minioClient.listMultipart(bucketName, region, objectName, maxParts, partNumberMarker, uploadId, extraHeaders, extraQueryParams);
     }
+    /*
+     * @description: TODO 进行MD5 校验
+     * @author: Ruby Ceng 曾春佳
+     * @date: 2024/7/4 15:48
+     * @param: [uniqueIdentifier]
+     * @return: java.lang.Boolean
+     **/
+    public Boolean md5Verify(String bucketName,String objectName , String uniqueIdentifier) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        if(StrUtil.isEmpty(bucketName)){
+            bucketName = ossProperties.getDefaultBucketName();
+        }
+        StatObjectResponse response = minioClient.statObject(StatObjectArgs.builder().bucket(bucketName).object(objectName).build());
+        String etag = response.etag();
+        if(uniqueIdentifier.equals(etag))return true;
+        else return false;
+    }
 }

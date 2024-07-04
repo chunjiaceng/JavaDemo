@@ -1,5 +1,7 @@
 package com.example.demo;
 
+import cn.hutool.crypto.digest.DigestAlgorithm;
+import cn.hutool.crypto.digest.Digester;
 import com.example.demo.pojo.User;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -31,6 +33,13 @@ class DemoApplicationTests {
                 .doOnEach(n -> log.info("doOnEach: {} , {}",n.getType(),n.get()))
                 .map(n -> n*n)
                 .subscribe(n-> log.info("Subscribe: {}", n));
+
+    }
+    @Test
+    public void digester(){
+        Digester md5 = new Digester(DigestAlgorithm.MD5);
+        String s = md5.digestHex("str1");
+        System.out.println(s);
 
     }
 
